@@ -1,5 +1,5 @@
 name: SlashServer
 author: Bloodsplat
-version: "3.0"
+version: "4.0"
 main : com.minecraftdimensions.slashserver.SlashServer
 api-version: "1.16"
