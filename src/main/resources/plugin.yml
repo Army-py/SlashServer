@@ -1,4 +1,5 @@
 name: SlashServer
-main : com.minecraftdimensions.slashserver.SlashServer
-version: 3
 author: Bloodsplat
+version: "${project.version}"
+main : com.minecraftdimensions.slashserver.SlashServer
+api-version: "1.16"

@@ -1,56 +1,61 @@
 package com.minecraftdimensions.slashserver;
 
-import com.minecraftdimensions.slashserver.configlibrary.Config;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import com.minecraftdimensions.slashserver.command.ServerCommand;
+import com.minecraftdimensions.slashserver.command.SlashServerReloadCommand;
+import com.minecraftdimensions.slashserver.util.Config;
+
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.api.scheduler.ScheduledTask;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class SlashServer extends Plugin {
-	ProxyServer proxy;
-    public static Config c;
+    ProxyServer proxy;
+
+    public static Config config;
+
     public static HashMap<String, Integer> time = new HashMap<>();
-    public static ArrayList<ProxiedPlayer> tasks = new ArrayList<>(  );
+
+    public static ArrayList<ProxiedPlayer> tasks = new ArrayList<>();
+
     public static SlashServer INSTANCE;
+
     public static String ALREADY_ON_SERVER;
+
     public static String TELEPORTING;
+
     public static String ALREADY_TELEPORTING;
 
-	public void onEnable() {
+    public void onEnable() {
         INSTANCE = this;
-		proxy = ProxyServer.getInstance();
-		registerCommands();
+        this.proxy = ProxyServer.getInstance();
+        registerCommands();
         setupConfig();
-	}
-
-    private void setupConfig() {
-        String configpath = File.separator + "plugins" + File.separator + "SlashServer" + File.separator + "config.yml";
-        c = new Config( configpath );
-        for(String data: proxy.getServers().keySet()){
-            time.put( data, c.getInt( data,0 ) );
-        }
-        ALREADY_ON_SERVER = color(c.getString( "ALREADY_ON_SERVER", "&cYou are already on that server!" ));
-        TELEPORTING = color(c.getString( "TELEPORTING", "&2Teleporting your to the server {name}" ));
-        ALREADY_TELEPORTING = color(c.getString( "ALREADY_TELEPORTING", "&cAlready teleporting you to a server" ));
     }
 
-    public static String color( String input ){
-        return ChatColor.translateAlternateColorCodes('&',input);
+    private void setupConfig() {
+        config = new Config(getDataFolder(), "config.yml");
+        ALREADY_ON_SERVER = color(config.getString("ALREADY_ON_SERVER", "&cYou are already on that server!"));
+        TELEPORTING = color(config.getString("TELEPORTING", "&2Teleporting your to the server {name}"));
+        ALREADY_TELEPORTING = color(config.getString("ALREADY_TELEPORTING", "&cAlready teleporting you to a server"));
+
+        for (String data : this.proxy.getServers().keySet())
+            time.put(data, Integer.valueOf(config.getInt(data, 0)));
+    }
+
+    public static String color(String input) {
+        return ChatColor.translateAlternateColorCodes('&', input);
     }
 
     private void registerCommands() {
-		for (String data : proxy.getServers().keySet()) {
-			ProxyServer.getInstance().getPluginManager().registerCommand( this, new ServerCommand( data, "slashserver."+data ) );
-		}
-
-        ProxyServer.getInstance().getPluginManager().registerCommand( this, new SlashServerReloadCommand( "reloadss", "slashserver.reload", "reloadslashserver", "slashserverreload", "ssreload" ) );
-	}
-
-
-
+        for (String data : this.proxy.getServers().keySet()) {
+            ProxyServer.getInstance().getPluginManager()
+                .registerCommand(this, new ServerCommand(data, "slashserver." + data, new String[0]));
+        }
+        ProxyServer.getInstance().getPluginManager()
+            .registerCommand(this, new SlashServerReloadCommand("reloadss", "slashserver.reload", new String[] { "reloadslashserver", "slashserverreload", "ssreload" }));
+    }
 }
