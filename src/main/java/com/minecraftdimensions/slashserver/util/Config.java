@@ -20,6 +20,7 @@ public class Config {
     public Config(File dataFolder, String fileName) {
         this.dataFolder = dataFolder;
         this.fileName = fileName;
+        this.load();
     }
 
     public void load() {
